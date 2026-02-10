@@ -1,18 +1,18 @@
 # Why I Built a Routing Architecture for AI Agents
 
-> **Separation of concerns — applied to AI context windows instead of code modules.**
+> **Separation of concerns, applied to AI context windows instead of code modules.**
 
-This is the system I use to run my entire content operation with AI agents — scripting, animation specs, topic research, platform optimization, production tracking. Every piece flows through here.
+This is the system I use to run my entire content operation with AI agents. Scripting, animation specs, topic research, platform optimization, production tracking. Every piece flows through here.
 
-But this isn't a content system. It's a software architecture problem that happens to produce content. And the solution is the same one engineers have been reaching for since the 1970s.
+But this isn't really a content system. It's a software architecture problem that happens to produce content. And the solution is the same one engineers have been reaching for since the 1970s.
 
 ---
 
 ## The Problem Nobody Talks About
 
-Most people using AI agents dump everything into one conversation. Brand guidelines, templates, hooks, platform specs, product strategy — all of it. Every time.
+Most people using AI agents dump everything into one conversation. Brand guidelines, templates, hooks, platform specs, product strategy, all of it, every time. And then they wonder why the output gets progressively worse, why the agent starts hallucinating rules from three files ago, and why their API bill looks like a phone number.
 
-Here's what's actually happening: **you're recreating the monolith problem.**
+Here's what's actually happening. You're recreating the monolith problem.
 
 | Monolithic App | Monolithic Context |
 |---|---|
@@ -21,7 +21,7 @@ Here's what's actually happening: **you're recreating the monolith problem.**
 | Change in payments breaks notifications | Voice rules bleed into animation timing |
 | Fix: microservices with clear contracts | Fix: routing layers with selective loading |
 
-The context window is not a filing cabinet. It's working memory. Load 15,000 tokens when the agent needs 4,000, and those extra 11,000 tokens aren't neutral — they're noise that dilutes the signal.
+The context window is not a filing cabinet. It's working memory. And when you load 15,000 tokens into an agent that needs 4,000 of them, the extra 11,000 aren't neutral. They're noise. The agent starts blending voice rules with platform specs, confusing animation timing with script structure, pulling from brand strategy docs when it should be writing code.
 
 ---
 
@@ -34,29 +34,29 @@ The context window is not a filing cabinet. It's working memory. Load 15,000 tok
 | **Microservices** | Each service owns its data, exposes a contract |
 | **Unix philosophy** | Each program does one thing, communicates through pipes |
 | **Good API design** | Each endpoint returns the minimum viable response |
-| **This system** | Each agent loads exactly the files — and *sections* of files — it needs |
+| **This system** | Each agent loads exactly the files, and the *sections* of files, it needs |
 
-No agent loads everything. No file contains information that belongs somewhere else.
+No agent loads everything. No file contains information that belongs in another file.
 
 ---
 
 ## How It Actually Works
 
-Three layers. If you've worked with a load balancer → app servers → database, the mental model is the same.
+Three layers. If you've worked with a load balancer in front of app servers in front of a database, the mental model is the same.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  LAYER 0 — System Prompt (CLAUDE.md)                        │
 │  ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄  │
 │  Always loaded. Folder map + ID systems.                    │
-│  The DNS of the system — resolves names to locations.       │
+│  The DNS of the system. Resolves names to locations.        │
 │  ~800 tokens. Paid every conversation, so it stays lean.    │
 └──────────────────────────┬──────────────────────────────────┘
                            ▼
 ┌─────────────────────────────────────────────────────────────┐
 │  LAYER 1 — Routing Table (CONTEXT.md)                       │
 │  ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄  │
-│  Maps tasks → workspaces. "Writing a script? Go here."      │
+│  Maps tasks to workspaces. "Writing a script? Go here."     │
 │  A load balancer. Directs traffic, doesn't do work.         │
 │  ~300 tokens. Read once per session.                        │
 └──────────────────────────┬──────────────────────────────────┘
@@ -73,7 +73,7 @@ Three layers. If you've worked with a load balancer → app servers → database
 │  LAYER 3 — Content Files (loaded selectively)               │
 │  ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄  │
 │  The actual reference material.                             │
-│  Loaded per the CONTEXT.md routing tables — not all at once.│
+│  Loaded per the CONTEXT.md routing tables, not all at once. │
 │  ~500-3000 tokens each. Only what the task requires.        │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -110,7 +110,7 @@ Content Writing/
 
 ### 1. Canonical Sources
 
-> Every piece of information lives in exactly one place. Other files point to it — never copy it.
+> Every piece of information lives in exactly one place. Other files point to it, they never copy it.
 
 | Information | Lives In | Referenced By |
 |---|---|---|
@@ -121,7 +121,7 @@ Content Writing/
 | Design rules | `design-system.md` | animation-studio/docs |
 | Remotion patterns | Skills system | nowhere in filesystem |
 
-The moment the same rule exists in two files, they will inevitably drift. One-source, many-references.
+The moment the same rule exists in two files, they will inevitably drift. Someone updates one and forgets the other. Now you have two rules and the agent has no way to know which one is current.
 
 ### 2. One-Way Dependencies
 
@@ -130,11 +130,11 @@ The moment the same rule exists in two files, they will inevitably drift. One-so
 ❌  brand-vault/CONTEXT.md  ──→  "script-lab reads us for voice"
 ```
 
-Bidirectional references = circular dependencies. Every new workspace would update every workspace that references it. That's **O(n²) maintenance**. One-way references scale linearly.
+Bidirectional references create the same problem as circular dependencies in code. Every new workspace would need to update every workspace that references it. That's **O(n²) maintenance**. One-way references scale linearly. If you've ever untangled a circular import in Python, you already know this.
 
 ### 3. Selective Section Loading
 
-This is the highest-leverage pattern in the system.
+This is the highest-leverage pattern in the whole system.
 
 | File | Total Lines | Lines an Agent Needs | What Gets Skipped |
 |---|---|---|---|
@@ -142,33 +142,33 @@ This is the highest-leverage pattern in the system.
 | `who-jake-is.md` | 95 | ~15 (one-liner + surfacing rule) | Full credential backstory |
 | `content-pillars.md` | 120 | ~25 (one pillar section) | The other four pillars |
 
-The routing table doesn't say "load this file." It says "load *these sections* of this file." Same principle as database views — comprehensive data underneath, projected queries on top.
+The routing table doesn't say "load this file." It says "load *these sections* of this file." Same principle as database views. The underlying data is comprehensive, but different consumers query different projections of that data based on what they actually need.
 
 ---
 
 ## What I Learned Building This
 
 <details>
-<summary><b>Version 1: The monolith</b> — everything in one file</summary>
+<summary><b>Version 1: The monolith</b></summary>
 
-Worked for about two weeks. That's roughly how long it takes for any project to outgrow a single-file architecture.
+Everything in one file. It worked for about two weeks. That's roughly how long it takes for the scope of any project to outgrow a single-file architecture.
 </details>
 
 <details>
-<summary><b>Version 2: The distributed monolith</b> — split into folders, duplicated everywhere</summary>
+<summary><b>Version 2: The distributed monolith</b></summary>
 
-Every workspace described its relationship to every other workspace. Updating a rule in one place meant hunting down four other files that said the same thing. Classic content drift.
+Split into folders, but duplicated information everywhere. Every workspace described its relationship to every other workspace. Updating a rule in one place meant hunting down four other files that said the same thing. Classic content drift.
 </details>
 
 <details>
-<summary><b>Version 3: The routing architecture</b> — current system</summary>
+<summary><b>Version 3: The routing architecture (current)</b></summary>
 
-Follows a principle I learned maintaining cryptographic systems in the Marines: **the system that works is the one where every component has one job, and the interfaces between components are explicit and documented.** In crypto, ambiguity in interfaces gets people killed. In content systems, it wastes money and produces bad output. The engineering principle is identical.
+Follows a principle I learned maintaining cryptographic systems in the Marines: the system that works is the one where every component has one job, and the interfaces between components are explicit and documented. In crypto, ambiguity in interfaces gets people killed. In content systems, it wastes money and produces bad output. The engineering principle is identical regardless.
 </details>
 
 ### The Biggest Single Improvement
 
-The animation spec format. I was writing specs as prose:
+The animation spec format. I was writing specs as prose descriptions:
 
 ```
 ❌  "The text should fade in with a bouncy spring effect"
@@ -182,7 +182,7 @@ The agent interpreted that differently every time. When I switched to code bluep
     //   springPreset="bouncy" startFrame={BEATS.TITLE_IN}
 ```
 
-Output quality jumped immediately. **Interpretation introduces variance. Translation preserves intent.**
+The output quality jumped immediately. Prose descriptions require interpretation, and interpretation introduces variance every single time. Code blueprints only require translation, and translation preserves intent. That single shift in how we write specs changed everything about the quality of what came out the other end.
 
 ---
 
@@ -196,26 +196,26 @@ Output quality jumped immediately. **Interpretation introduces variance. Transla
 | Plan the week | weekly flow + analytics | ~1,500 | ~15,000+ |
 | Render a video | composition name | ~500 | ~15,000+ |
 
-That's not just a cost difference. It's a quality difference. Every token of irrelevant context is a token of diluted attention. The agent writing your script doesn't need to know your LinkedIn posting schedule. Give it exactly what it needs, and the output is measurably better.
+The cost savings are nice, but I think the more interesting thing is what happens to output quality. Every token of irrelevant context is a token of diluted attention. The agent writing your script doesn't need to know your LinkedIn posting schedule. When you give it exactly what it needs and nothing else, the outputs get noticeably better. I don't think most people realize how much of their "AI isn't good enough" frustration is actually a context architecture problem.
 
 ---
 
 ## If You're Building Something Similar
 
-The principles transfer to any system where AI agents need structured context.
+These principles transfer to any system where AI agents need structured context.
 
 | # | Principle | Why |
 |---|---|---|
-| 1 | **Map your information architecture first** | Before writing a single prompt, figure out what exists, where it canonically lives, and which tasks need which pieces |
-| 2 | **Routing files ≠ content files** | A CONTEXT.md tells the agent what to load. It doesn't contain the knowledge itself. The moment it does, you've created a maintenance burden |
-| 3 | **One-way dependencies only** | A → B is fine. B → A back is a design problem. If both need shared info, put it in C |
-| 4 | **Route to sections, not files** | Loading 80 lines instead of 174 compounds across every conversation |
-| 5 | **Write for machines, store for humans** | Brand docs explain *why*. Routing layers extract *what*. Both exist. Neither serves both audiences |
+| 1 | **Map your information architecture first** | Before writing a single prompt, figure out what information exists, where it canonically lives, and which tasks need which pieces |
+| 2 | **Routing files ≠ content files** | A CONTEXT.md tells the agent what to load. It doesn't contain the knowledge itself. The moment it starts containing reference material, you've created a maintenance burden |
+| 3 | **One-way dependencies only** | A → B is fine. B → A back means you probably need a third location C that both reference |
+| 4 | **Route to sections, not just files** | Loading 80 lines instead of 174 compounds across every single conversation you run |
+| 5 | **Write for machines, store for humans** | The brand docs explain *why* each rule exists. The routing layer extracts just the *what*. Both versions exist, and neither tries to serve both audiences |
 
-The system in this repo is specific to content production, but the architecture isn't. It's dependency injection for AI agents. If your agents need context, and that context has structure, this pattern works.
+The system in this repo is built for content production specifically, but the architecture underneath it isn't. It's really just dependency injection applied to AI agents. If your agents need context and that context has any structure to it at all, this pattern works.
 
 ---
 
 <p align="center">
-  <i>Built by <a href="https://github.com/RinDig">Jake Haas</a> — software engineer, content architect, professional overthinker about abstraction layers.</i>
+  <i>Built by <a href="https://github.com/RinDig">Jake van Clief</a> — software engineer, content architect, professional overthinker about abstraction layers.</i>
 </p>
