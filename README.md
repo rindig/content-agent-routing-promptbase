@@ -1,6 +1,6 @@
 # Why I Built a Routing Architecture for AI Agents
 
-This is the system I use to run my entire content operation with AI agents — scripting, animation specs, topic research, platform optimization, production tracking. Every piece flows through here.
+This is the system I use to run my entire content operation with AI agents scripting, animation specs, topic research, platform optimization, production tracking. Every piece flows through here.
 
 But this isn't a content system. It's a software architecture problem that happens to produce content. And the solution is the same one engineers have been reaching for since the 1970s: **separation of concerns**.
 
@@ -8,7 +8,7 @@ But this isn't a content system. It's a software architecture problem that happe
 
 ## The Problem Nobody Talks About
 
-Most people using AI agents dump everything into one conversation. Brand guidelines, templates, hooks, platform specs, product strategy — all of it. Every time. And then they wonder why the output gets progressively worse, why the agent starts hallucinating rules from three files ago, and why their API bill looks like a phone number.
+Most people using AI agents dump everything into one conversation. Brand guidelines, templates, hooks, platform specs, product strategy  all of it. Every time. And then they wonder why the output gets progressively worse, why the agent starts hallucinating rules from three files ago, and why their API bill looks like a phone number.
 
 Here's what's actually happening: you're recreating the monolith problem.
 
@@ -36,7 +36,7 @@ No agent loads everything. No file contains information that belongs somewhere e
 
 The architecture has three layers. If you've ever worked with a load balancer in front of application servers in front of a database, the mental model is the same.
 
-**Layer 0 — the system prompt.** Always loaded. This is the folder map and ID system. It tells the agent where things are. It's the DNS of the system — it resolves names to locations. About 800 tokens. You pay this cost every conversation, so it has to be lean.
+**Layer 0 — the system prompt.** Always loaded. This is the folder map and ID system. It tells the agent where things are. It's the DNS of the system  it resolves names to locations. About 800 tokens. You pay this cost every conversation, so it has to be lean.
 
 **Layer 1 — the routing table.** A single file at the project root that maps tasks to workspaces. "Writing a script? Go here. Generating a spec? Go there." It's a load balancer. It doesn't do the work. It directs traffic. About 300 tokens.
 
