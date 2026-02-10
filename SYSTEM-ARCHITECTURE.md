@@ -1,6 +1,6 @@
 # System Architecture — How the Agent Routing Works
 
-This document is for **you** (Jake), not for agents. It explains why the system is designed this way, how agents navigate it, and how to maintain it.
+This document explains why the system is designed this way, how agents navigate it, and how to maintain it.
 
 ---
 
