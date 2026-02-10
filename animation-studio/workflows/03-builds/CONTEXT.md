@@ -20,15 +20,17 @@ This is the **build tracking** stage. Metadata files here track which animations
 
 Load these **before starting any build**:
 
-| File | Why | Path |
-|------|-----|------|
-| **The spec** | Your blueprint — scene breakdown, BEATS, visual descriptions | `../02-specs/[format]/[pillar]/[slug]-spec.md` |
-| **Component registry** | Available shared components and their props | `../../docs/component-registry.md` |
-| **Design system** | Colors, typography, springs, layout constants | `../../docs/design-system.md` |
+| Priority | File | Why | Path |
+|----------|------|-----|------|
+| **1 — Always** | **The spec** | Your blueprint — every color, position, component prop, and frame number is here | `../02-specs/[format]/[pillar]/[slug]-spec.md` |
+| **2 — Always** | **One existing composition** | Learn conventions: import paths, file structure, Series/Sequence patterns, shared constants | Pick any clip in `../../src/compositions/EdubaShorts/clips/[pillar]/` — read its `index.tsx`, one scene, and `timing.ts` |
+| **3 — Always** | **Registration file** | Where to register your new composition | `../../src/compositions/EdubaShorts/index.tsx` |
+| **4 — On demand** | **Component registry** | Only if a spec references a component you haven't seen in the example clip | `../../docs/component-registry.md` |
+| **5 — On demand** | **`remotion-best-practices` skill** | Only if you hit a Remotion API question (spring, interpolate, TransitionSeries) | Call the skill |
 
-**Don't load:** Other specs, other compositions (unless reusing a specific pattern), scripts, rendered videos.
+**Don't load:** Design system (the spec already encodes all design choices as exact values), other specs, scripts, rendered videos, the full `src/` tree.
 
-For Remotion API patterns (spring, interpolate, Sequence, TransitionSeries), use the `remotion-best-practices` skill — don't rely on examples in this file.
+**Why no design system?** A well-written spec bakes in every design decision — hex colors, px sizes, spring preset names, safe margins. The design system is critical for *writing* specs, not for *building from* them. If a spec is missing exact values, that's a spec quality problem — fix the spec, don't send the builder to read the design system.
 
 ---
 
@@ -38,11 +40,12 @@ You don't need deep context on other folders, but here's what they do and when y
 
 | Stage | What It Contains | When You'd Reference It |
 |-------|-----------------|------------------------|
-| `01-scripts/` | Narrative scripts | Almost never — the spec already distilled the content |
+| `01-scripts/` | Narrative scripts | Never — the spec already distilled the content |
 | `02-specs/` | Animation blueprints | **Always** — this is your primary input |
 | `04-renders/` | Rendered video files | Never — you're upstream of rendering |
-| `../../docs/` | Design system + component registry | **Always** — your visual rules and component API |
-| `../../src/` | Composition source code | When building — this is where your code goes |
+| `../../docs/component-registry.md` | Component APIs + import paths | **On demand** — only when the spec uses a component you haven't seen |
+| `../../docs/design-system.md` | Colors, typography, springs, layout rules | **Never at build time** — specs already encode these as exact values |
+| `../../src/compositions/` | Existing composition source code | **One example** — read one clip to learn conventions, then build |
 
 ---
 
@@ -118,25 +121,26 @@ Create `active/[slug].md` with the metadata and progress checklist.
 
 ### 2. Set up composition folder
 ```
-../../src/compositions/[Format]/[ProjectName]/
+../../src/compositions/EdubaShorts/clips/[pillar]/[ClipName]/
 ├── index.tsx          ← Main composition (assembles scenes via Sequence)
+├── timing.ts          ← Scene durations + TOTAL_DURATION export
 ├── scenes/            ← Individual scene components
-├── components/        ← Project-specific custom components
-└── constants/         ← colors.ts, timing.ts (BEATS from spec go here)
+└── components/        ← Project-specific custom components
 ```
+Shared constants (colors, typography, springs) are in `../../constants/`.
 
 ### 3. Translate the spec scene-by-scene
 
 For each scene in the spec:
 
-1. **Copy the BEATS constant** from the spec directly into your scene file or `constants/timing.ts`
+1. **Copy the BEATS constant** from the spec directly into your scene file (convert global frame numbers to local by subtracting the scene's start frame)
 2. **Read each frame-range block** and translate the visual description to JSX + Remotion springs/interpolations
 3. **Use inline component props from the spec** — they're already written for you (e.g., `AnimatedText variant="title" size={52} color="#F59E0B" entrance="scale" springPreset="bouncy"`)
-4. **Import shared components** from `@/components/core/` per the component registry
-5. **Build custom components** described in the spec's "Project-Specific Components" section
+4. **Match import paths from the example clip you read** — shared components, constants, effects all follow the same relative path pattern
+5. **Build custom components** described in the spec's "Project-Specific Components" section — read the actual source of any referenced component if the spec's described API doesn't match what you find
 
 ### 4. Register the composition
-Add the composition to `../../src/index.ts` with correct dimensions, fps, and duration from the spec header.
+Add the composition to `../../src/compositions/EdubaShorts/index.tsx` — import the component + its `TOTAL_DURATION`, add a `<Composition>` in the appropriate pillar folder (P1-P5).
 
 ### 5. Test in Remotion Studio
 Run `npm run dev`, preview the composition, verify against the spec.
@@ -153,7 +157,7 @@ A build is complete when:
 - [ ] Every scene from the spec is implemented
 - [ ] BEATS constants match the spec's frame numbers
 - [ ] Component props match the spec's inline descriptions
-- [ ] Colors, typography, and springs follow the design system
+- [ ] Colors, typography, and springs match the spec's exact values
 - [ ] Closing scene follows the standard pattern (BlurText + accent + glow + hold)
 - [ ] Composition registered in `src/index.ts`
 - [ ] Previewed in Remotion Studio — animations smooth, text readable, timing correct

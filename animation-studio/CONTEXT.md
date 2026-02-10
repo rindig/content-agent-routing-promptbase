@@ -46,10 +46,16 @@ animation-studio/
 │
 ├── src/                        ← Remotion source code
 │   ├── index.ts                ← Composition registration
-│   ├── components/core/        ← Shared reusable components
-│   └── compositions/           ← Per-video composition code
-│       ├── ShortForm/
-│       └── LongForm/
+│   ├── components/core/        ← Shared reusable components (effects, etc.)
+│   └── compositions/
+│       └── EdubaShorts/        ← All clips, organized by pillar
+│           ├── constants/      ← Shared colors, timing, typography
+│           ├── index.tsx       ← Composition registry
+│           └── clips/
+│               ├── P1-layers-beneath/
+│               ├── P3-methods-not-tools/
+│               ├── P4-builders-architecture/
+│               └── [P2, P5 created as needed]
 │
 └── public/                     ← Static assets (images, fonts)
 ```
@@ -60,7 +66,7 @@ animation-studio/
 
 1. **Readability first.** Title 72px+, body 48px+, code 32px+. High contrast on dark backgrounds. 5% safe margins.
 2. **Remotion only.** All animations use `spring()` / `interpolate()` via `useCurrentFrame()`. CSS transitions are forbidden.
-3. **Check before building.** Always check `docs/component-registry.md` before creating new components. Reusable → `src/components/core/`. Project-specific → `src/compositions/[Project]/components/`.
+3. **Check before building.** Always check `docs/component-registry.md` before creating new components. Reusable → `src/components/core/`. Project-specific → clip's own `components/` folder.
 4. **Specs are code blueprints.** Every spec includes BEATS constants, frame-range micro-blocks, and inline component props. See `workflows/02-specs/CONTEXT.md`.
 
 ---
