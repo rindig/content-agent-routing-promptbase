@@ -1,0 +1,24 @@
+{
+  "name": "remotion-animations",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "npx remotion studio src/index.ts",
+    "build": "npx remotion render src/index.ts",
+    "upgrade": "npx remotion upgrade"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "remotion": "^4.0.331",
+    "@remotion/cli": "^4.0.331",
+    "@remotion/shapes": "^4.0.331",
+    "@remotion/transitions": "^4.0.331",
+    "zod": "3.22.3"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "typescript": "^5.7.0"
+  }
+}
