@@ -7,6 +7,8 @@ This is the system I use to run my entire content operation with AI agents. Scri
 But this isn't really a content system. It's a software architecture problem that happens to produce content. And the solution is the same one engineers have been reaching for since the 1970s.
 
 ---
+<img width="753" height="665" alt="image" src="https://github.com/user-attachments/assets/ee055227-6627-4015-ab81-0dc5c9f8dc71" />
+
 
 ## The Problem Nobody Talks About
 
